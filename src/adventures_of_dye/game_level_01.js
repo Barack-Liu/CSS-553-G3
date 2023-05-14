@@ -27,6 +27,7 @@ class GameLevel_01 extends engine.Scene {
         this.kDoorSleeve = "assets/DoorFrame_AnimSheet.png";
         this.kButton = "assets/DoorFrame_Button_180x100.png";
         this.kProjectileTexture = "assets/EMPPulse.png";
+        this.kHealth = "assets/heart.png";
 
         // specifics to the level
         this.kLevelFile = "assets/" + level + "/" + level + ".xml";  // e.g., assets/Level1/Level1.xml
@@ -80,6 +81,7 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.load(this.kDoorSleeve);
         engine.texture.load(this.kButton);
         engine.texture.load(this.kProjectileTexture);
+        engine.texture.load(this.kHealth);
 
         engine.texture.load(this.kBg);
         engine.texture.load(this.kBgNormal);
@@ -103,6 +105,7 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.unload(this.kDoorSleeve);
         engine.texture.unload(this.kButton);
         engine.texture.unload(this.kProjectileTexture);
+        engine.texture.unload(this.kHealth);
 
         engine.texture.unload(this.kBg);
         engine.texture.unload(this.kBgNormal);
@@ -151,7 +154,7 @@ class GameLevel_01 extends engine.Scene {
         // parsing of actors can only begin after background has been parsed
         // to ensure proper support shadow
         // for now here is the hero
-        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet);
+        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth);
 
         this.mNextLevel = parser.parseNextLevel();
 
@@ -234,8 +237,12 @@ class GameLevel_01 extends engine.Scene {
             let minionBox = this.mAllMinions.getObjectAt(i).getRigidBody();
             collided = this.mIllumHero.getRigidBody().collisionTest(minionBox, collisionInfo);
             if (collided) {
+                // will get injury if hit minion, will restart if health goes to zero
                 this.mRestart = true;
-                // this.next();
+                this.mIllumHero.getInjury();
+                if(this.mIllumHero.currentHealth == 0){
+                    this.next();
+                }
             }
         }
 
@@ -244,8 +251,12 @@ class GameLevel_01 extends engine.Scene {
             let p = this.mAllMinions.getObjectAt(i).getProjectiles();
             collided = engine.particleSystem.resolveRigidShapeCollision(this.mIllumHero, p);
                 if (collided) {
+                    // will get injury if hit bullet, will restart if health goes to zero
                     this.mRestart = true;
-                    // this.next();
+                    this.mIllumHero.getInjury();
+                    if(this.mIllumHero.currentHealth == 0){
+                        this.next();
+                    }
                 }
             
         }

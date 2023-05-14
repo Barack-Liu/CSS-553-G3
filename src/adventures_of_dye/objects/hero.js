@@ -7,6 +7,7 @@
 
 "use strict";
 import engine from "../../engine/index.js";
+import Health from "../objects/health.js";
 
 let eHeroState = Object.freeze({
     eFaceRight: 0,
@@ -18,7 +19,7 @@ let eHeroState = Object.freeze({
 });
 
 class Hero extends engine.GameObject {
-    constructor(spriteTexture, normalMap, atX, atY, lgtSet) {
+    constructor(spriteTexture, normalMap, atX, atY, lgtSet, healthTexture) {
         super(null);
         this.kDelta = 0.1;
         this.kWidth = 2;
@@ -30,6 +31,18 @@ class Hero extends engine.GameObject {
             this.mDye = new engine.LightRenderable(spriteTexture);
         }
         this.mRenderComponent = this.mDye;
+
+        this.maxHealth = 5;
+        this.currentHealth = 5;
+        this.healthInterval= 0.7;
+        this.healths = []
+        this.lastInjuryTime = new Date().getTime();
+        for (let i = 0; i < this.maxHealth; i++) {
+            let health = new Health(atX, atY, healthTexture, lgtSet);
+            engine.layer.addToLayer(engine.layer.eActors, health);
+
+            this.healths.push(health)
+        }
 
         this.mDye.setColor([1, 1, 1, 0]);
         this.mDye.getXform().setPosition(atX, atY);
@@ -66,6 +79,13 @@ class Hero extends engine.GameObject {
 
     update() {
         super.update();
+
+        for (let i = 0; i < this.currentHealth; i++) {
+            let health = this.healths[i];
+            let healthX = this.mDye.getXform().getXPos() - 1 + this.healthInterval * i;
+            let healthY = this.mDye.getXform().getYPos() + this.kHeight*2/3
+            health.setPosition(healthX, healthY);
+        }
 
         this.mJumpBox.setPosition(this.mDye.getXform().getXPos(), this.mDye.getXform().getYPos() - this.kHeight / 2);
 
@@ -171,6 +191,19 @@ class Hero extends engine.GameObject {
 
     getJumpBox() {
         return this.mJumpBox;
+    }
+
+    getInjury(){
+        let injuryTime = new Date().getTime();
+        if(injuryTime - this.lastInjuryTime < 1000){
+            return;
+        }
+
+        let lastHealth = this.healths[this.currentHealth - 1];
+        engine.layer.removeFromLayer(engine.layer.eActors, lastHealth);
+        this.healths.pop();
+        this.currentHealth = this.currentHealth - 1;
+        this.lastInjuryTime = injuryTime;
     }
 }
 
