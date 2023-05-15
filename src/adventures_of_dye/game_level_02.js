@@ -14,7 +14,8 @@ class GameLevel_02 extends engine.Scene {
         this.kPlatformNormal = "assets/platform_normal.png";
         this.kWall = "assets/wall.png";
         this.kWallNormal = "assets/wall_normal.png";
-
+        this.kHealth = "assets/heart.png";
+        
         // specifics to the level
         this.kLevelFile = "assets/" + level + "/" + level + ".xml";  // e.g., assets/Level1/Level1.xml
         this.kBg = "assets/" + level + "/bg.png";
@@ -64,6 +65,7 @@ class GameLevel_02 extends engine.Scene {
         engine.texture.load(this.kPlatformNormal);
         engine.texture.load(this.kWall);
         engine.texture.load(this.kWallNormal);
+        engine.texture.load(this.kHealth);
 
         engine.texture.load(this.kBg);
         engine.texture.load(this.kBgNormal);
@@ -89,6 +91,7 @@ class GameLevel_02 extends engine.Scene {
         engine.texture.unload(this.kPlatformNormal);
         engine.texture.unload(this.kWall);
         engine.texture.unload(this.kWallNormal);
+        engine.texture.unload(this.kHealth);
 
         engine.texture.unload(this.kBg);
         engine.texture.unload(this.kBgNormal);
@@ -127,7 +130,7 @@ class GameLevel_02 extends engine.Scene {
         // parsing of actors can only begin after background has been parsed
         // to ensure proper support shadow
         // for now here is the hero
-        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet);
+        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth);
 
         let b = parser.parseBoss(this.kDyeBoss_Bottom, this.kDyeBoss_Top, this.kDyeBoss_CenterSpawn,
             this.kDyeBoss_Eyeballs, this.kDyeBoss_WeakPoint_Blue, this.kDyeBoss_WeakPoint_Green,
