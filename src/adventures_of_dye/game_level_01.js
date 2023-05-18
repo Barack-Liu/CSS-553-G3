@@ -29,6 +29,9 @@ class GameLevel_01 extends engine.Scene {
         this.kProjectileTexture = "assets/EMPPulse.png";
         this.kHealth = "assets/heart.png";
 
+        //Path for Treasure
+        this.kTreasure = "assets/Treasure_450x450.png";
+
         // specifics to the level
         this.kLevelFile = "assets/" + level + "/" + level + ".xml";  // e.g., assets/Level1/Level1.xml
         this.kBg = "assets/" + level + "/bg.png";
@@ -65,6 +68,9 @@ class GameLevel_01 extends engine.Scene {
         this.mAllDoors = new engine.GameObjectSet();
         this.mAllMinions = new engine.GameObjectSet();
         this.mAllParticles = new engine.ParticleSet();
+
+        //Treasure set
+        this.mAllTreasures = new engine.GameObjectSet();
     }
 
     load() {
@@ -82,6 +88,9 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.load(this.kButton);
         engine.texture.load(this.kProjectileTexture);
         engine.texture.load(this.kHealth);
+
+        //Load Treasure
+        engine.texture.load(this.kTreasure);
 
         engine.texture.load(this.kBg);
         engine.texture.load(this.kBgNormal);
@@ -106,6 +115,9 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.unload(this.kButton);
         engine.texture.unload(this.kProjectileTexture);
         engine.texture.unload(this.kHealth);
+
+        //Unload Treasure
+        engine.texture.unload(this.kTreasure);
 
         engine.texture.unload(this.kBg);
         engine.texture.unload(this.kBgNormal);
@@ -149,6 +161,12 @@ class GameLevel_01 extends engine.Scene {
         let b = parser.parseButtons(this.kButton, this.mGlobalLightSet);
         for (i = 0; i < b.length; i++) {
             this.mAllButtons.addToSet(b[i]);
+        }
+
+        //Parse Treasure
+        let t = parser.parseTreasures(this.kTreasure, this.mGlobalLightSet);
+        for (i = 0; i < t.length; i++) {
+            this.mAllTreasures.addToSet(t[i]);
         }
 
         // parsing of actors can only begin after background has been parsed
@@ -266,6 +284,23 @@ class GameLevel_01 extends engine.Scene {
             collided = this.mIllumHero.getRigidBody().collisionTest(buttonBox, collisionInfo);
             if (collided) {
                 this.mAllButtons.getObjectAt(i).pressButton();
+            }
+        }
+
+        //Detect the collison between Hero and Treasure
+        for (i = 0; i < this.mAllTreasures.size(); i++) {
+            let treasureBox = this.mAllTreasures.getObjectAt(i).getRigidBody();
+            collided = this.mIllumHero.getRigidBody().collisionTest(treasureBox, collisionInfo);
+            if (collided) {                
+                //Increase health only when the treasure is not pressed
+                if(this.mAllTreasures.getObjectAt(i).getTreasureState() === false){
+                    console.log("Hero add 1 health");
+
+                    this.mRestart = true;
+                    this.mIllumHero.IncreaseHealth();
+                }
+
+                this.mAllTreasures.getObjectAt(i).pressTreasure();
             }
         }
 

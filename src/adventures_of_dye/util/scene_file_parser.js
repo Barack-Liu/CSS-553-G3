@@ -15,6 +15,7 @@ import Boss from "../objects/boss.js";
 import Wall from "../objects/wall.js";
 import Door from "../objects/door.js";
 import Button from "../objects/button.js";
+import Treasure from "../objects/treasure.js";
 
 class SceneFileParser {
     constructor(sceneFilePath) {
@@ -239,6 +240,26 @@ class SceneFileParser {
         }
 
         return allButtons;
+    }
+
+    //Parse Treasure
+    parseTreasures(texture, lightSet) {
+        let elm = this._getElm("Treasure");
+        let i, x, y, t, b;
+        let allTreasures = [];
+        for (i = 0; i < elm.length; i++) {
+            x = Number(elm.item(i).attributes.getNamedItem("PosX").value);
+            y = Number(elm.item(i).attributes.getNamedItem("PosY").value);
+            t = Number(elm.item(i).attributes.getNamedItem("Type").value);
+
+            b = new Treasure(x, y, texture, t, lightSet);
+            engine.layer.addToLayer(engine.layer.eActors, b);
+            engine.layer.addAsShadowCaster(b);
+
+            allTreasures.push(b);
+        }
+
+        return allTreasures;
     }
 
     parseBackground(level, refCam, lightSet) {

@@ -25,6 +25,9 @@ class Hero extends engine.GameObject {
         this.kWidth = 2;
         this.kHeight = 8 / 3;
 
+        this.healthTexture = healthTexture;
+        this.lgtSet = lgtSet;
+
         if (normalMap !== null) {
             this.mDye = new engine.IllumRenderable(spriteTexture, normalMap);
         } else {
@@ -32,9 +35,9 @@ class Hero extends engine.GameObject {
         }
         this.mRenderComponent = this.mDye;
 
-        this.maxHealth = 5;
-        this.currentHealth = 5;
-        this.healthInterval= 0.7;
+        this.maxHealth = 9;
+        this.currentHealth = 6;
+        this.healthInterval= 0.72;
         this.healths = []
         this.lastInjuryTime = new Date().getTime();
         for (let i = 0; i < this.maxHealth; i++) {
@@ -83,7 +86,7 @@ class Hero extends engine.GameObject {
         for (let i = 0; i < this.currentHealth; i++) {
             let health = this.healths[i];
             let healthX = this.mDye.getXform().getXPos() - 1 + this.healthInterval * i;
-            let healthY = this.mDye.getXform().getYPos() + this.kHeight*2/3
+            let healthY = this.mDye.getXform().getYPos() + this.kHeight*2/3;
             health.setPosition(healthX, healthY);
         }
 
@@ -205,6 +208,30 @@ class Hero extends engine.GameObject {
         this.currentHealth = this.currentHealth - 1;
         this.lastInjuryTime = injuryTime;
     }
+
+    //Increase Hero health
+    // IncreaseHealth(){
+    //     let lastHealth = this.healths[this.currentHealth - 1];
+    //     engine.layer.removeFromLayer(engine.layer.eActors, lastHealth);
+    //     this.healths.pop();
+    //     this.currentHealth = this.currentHealth + 1;
+    // }
+
+    IncreaseHealth() {
+        // Ensure that health does not go beyond the maximum limit.
+        if(this.currentHealth < this.maxHealth) {
+            let atX = this.mDye.getXform().getXPos() - 1 + this.healthInterval * this.currentHealth;
+            let atY = this.mDye.getXform().getYPos() + this.kHeight*2/3;
+            
+            let newHealth = new Health(atX, atY, this.healthTexture, this.lgtSet);
+            
+            engine.layer.addToLayer(engine.layer.eActors, newHealth);
+            this.healths.push(newHealth);
+            this.currentHealth = this.currentHealth + 1;
+        }
+        //Bug: when Hero adds 1 point health, an extral health shows up in other place
+    }
+        
 }
 
 export default Hero;
