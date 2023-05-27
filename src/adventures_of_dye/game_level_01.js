@@ -28,6 +28,7 @@ class GameLevel_01 extends engine.Scene {
         this.kButton = "assets/DoorFrame_Button_180x100.png";
         this.kProjectileTexture = "assets/EMPPulse.png";
         this.kHealth = "assets/heart.png";
+        this.kHeroBulletTexture = "assets/herobullet.png"; //path for hero bullet texture
 
         //Path for Treasure
         this.kTreasure = "assets/Treasure_450x450.png";
@@ -88,6 +89,7 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.load(this.kButton);
         engine.texture.load(this.kProjectileTexture);
         engine.texture.load(this.kHealth);
+        engine.texture.load(this.kHeroBulletTexture); //load hero bullet texture
 
         //Load Treasure
         engine.texture.load(this.kTreasure);
@@ -115,6 +117,8 @@ class GameLevel_01 extends engine.Scene {
         engine.texture.unload(this.kButton);
         engine.texture.unload(this.kProjectileTexture);
         engine.texture.unload(this.kHealth);
+        engine.texture.unload(this.kHeroBulletTexture); //unload hero bullet texture
+
 
         //Unload Treasure
         engine.texture.unload(this.kTreasure);
@@ -262,6 +266,19 @@ class GameLevel_01 extends engine.Scene {
                     this.next();
                 }
             }
+        }
+
+        //Kill enemy once hero bullet hits enemy
+        //this.mIllumHero.mHeroBullet.killEnemy(this.mAllMinions);
+        for (i = 0; i < this.mAllMinions.size(); i++) {
+            let enemy = this.mAllMinions.getObjectAt(i);
+            collided = engine.particleSystem.resolveRigidShapeCollision(enemy, this.mIllumHero.mHeroBullets);
+            if (collided) { //if bullet hits the enemy              
+                console.log("Bullet hit a minion!");  
+                enemy.setVisibility(false); //this removes it from displaying on scene
+                this.mAllMinions.removeFromSet(enemy); //remove the minion from the set
+            }   
+            
         }
 
         let j;
