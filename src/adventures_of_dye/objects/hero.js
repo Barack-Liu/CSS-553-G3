@@ -8,6 +8,7 @@
 "use strict";
 import engine from "../../engine/index.js";
 import Health from "../objects/health.js";
+import HeroBullet from "../objects/herobullet.js";
 
 let eHeroState = Object.freeze({
     eFaceRight: 0,
@@ -19,13 +20,15 @@ let eHeroState = Object.freeze({
 });
 
 class Hero extends engine.GameObject {
-    constructor(spriteTexture, normalMap, atX, atY, lgtSet, healthTexture) {
+    constructor(spriteTexture, normalMap, atX, atY, lgtSet, healthTexture, bulletTexture) {
         super(null);
         this.kDelta = 0.1;
         this.kWidth = 2;
         this.kHeight = 8 / 3;
 
         this.healthTexture = healthTexture;
+        this.mHeroBulletTexture = bulletTexture;
+        this.mHeroBullets = new engine.ParticleSet();
         this.lgtSet = lgtSet;
 
         if (normalMap !== null) {
@@ -82,6 +85,7 @@ class Hero extends engine.GameObject {
 
     update() {
         super.update();
+        this.mHeroBullets.update();
 
         for (let i = 0; i < this.currentHealth; i++) {
             let health = this.healths[i];
@@ -96,6 +100,15 @@ class Hero extends engine.GameObject {
         let xform = this.getXform();
         this.mIsMoving = false;
         let v = this.getRigidBody().getVelocity();
+
+        if (engine.input.isKeyClicked(engine.input.keys.K)) { //if player presses key 'K' then shoot bullet
+            console.log("I pressed the key K");
+            this.mPreviousHeroState = this.mHeroState;
+            this.mHeroBullet = new HeroBullet(this.mHeroBulletTexture, this.getXform().getXPos(), this.getXform().getYPos(), 0, 0, 1, 1); //create bullet        
+            this.mHeroBullet.shootBullet(this.mHeroState, eHeroState); //shoot the bullet
+
+            this.mHeroBullets.addToSet(this.mHeroBullet); //add bullet to set of bullets
+        }
 
         if (engine.input.isKeyPressed(engine.input.keys.A)) {
             if (this.mCanJump === true) {
@@ -186,6 +199,7 @@ class Hero extends engine.GameObject {
     draw(aCamera) {
         super.draw(aCamera);
         this.mJumpBox.draw(aCamera);
+        this.mHeroBullets.draw(aCamera); //draw bullets to screen 
     }
 
     canJump(b) {
