@@ -9,6 +9,7 @@ import engine from "../engine/index.js";
 // local
 import SceneFileParser from "./util/scene_file_parser.js";
 import Hero from "./objects/hero.js"
+import Hero2 from "./objects/hero2.js"
 
 import GameLevel_02 from "./game_level_02.js";
 
@@ -53,7 +54,8 @@ class GameLevel_01 extends engine.Scene {
         // the hero and the support objects
         this.mHero = null;
         this.mIllumHero = null;
-
+        this.mHero2 = null;
+        this.mIllumHero2 = null;
         this.mGlobalLightSet = null;
 
         this.mThisLevel = level;
@@ -176,8 +178,8 @@ class GameLevel_01 extends engine.Scene {
         // parsing of actors can only begin after background has been parsed
         // to ensure proper support shadow
         // for now here is the hero
-        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth, this.kHeroBulletTexture);
-
+        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth,123, this.kHeroBulletTexture);
+        this.mIllumHero2 = new Hero2(this.kHeroSprite, null, 8, 6, this.mGlobalLightSet, this.kHealth,456);
         this.mNextLevel = parser.parseNextLevel();
 
 
@@ -186,6 +188,8 @@ class GameLevel_01 extends engine.Scene {
         // Hero can only be added as shadow caster after background is created
         engine.layer.addToLayer(engine.layer.eActors, this.mIllumHero);
         engine.layer.addAsShadowCaster(this.mIllumHero);
+        engine.layer.addToLayer(engine.layer.eActors, this.mIllumHero2);
+        engine.layer.addAsShadowCaster(this.mIllumHero2);
 
         this.mPeekCam = new engine.Camera(
             vec2.fromValues(0, 0),
@@ -245,12 +249,18 @@ class GameLevel_01 extends engine.Scene {
 
         let i;
         let collided = false;
+        let collided2 = false;
         let collisionInfo = new engine.CollisionInfo();
         for (i = 0; i < this.mAllPlatforms.size(); i++) {
             let platBox = this.mAllPlatforms.getObjectAt(i).getRigidBody();
             collided = this.mIllumHero.getJumpBox().collisionTest(platBox, collisionInfo);
+            collided2 = this.mIllumHero.getJumpBox().collisionTest(platBox, collisionInfo);
             if (collided) {
                 this.mIllumHero.canJump(true);
+                break;
+            }
+            if (collided2) {
+                this.mIllumHero2.canJump(true);
                 break;
             }
         }
@@ -258,6 +268,7 @@ class GameLevel_01 extends engine.Scene {
         for (i = 0; i < this.mAllMinions.size(); i++) {
             let minionBox = this.mAllMinions.getObjectAt(i).getRigidBody();
             collided = this.mIllumHero.getRigidBody().collisionTest(minionBox, collisionInfo);
+            collided2 = this.mIllumHero2.getRigidBody().collisionTest(minionBox, collisionInfo);
             if (collided) {
                 // will get injury if hit minion, will restart if health goes to zero
                 this.mRestart = true;
@@ -346,6 +357,9 @@ class GameLevel_01 extends engine.Scene {
         engine.physics.processObjToSet(this.mIllumHero, this.mAllPlatforms);
         engine.physics.processObjToSet(this.mIllumHero, this.mAllWalls);
         engine.physics.processObjToSet(this.mIllumHero, this.mAllDoors);
+        engine.physics.processObjToSet(this.mIllumHero2, this.mAllPlatforms);
+        engine.physics.processObjToSet(this.mIllumHero2, this.mAllWalls);
+        engine.physics.processObjToSet(this.mIllumHero2, this.mAllDoors);
 
         // Minion platform
         engine.physics.processSetToSet(this.mAllMinions, this.mAllPlatforms);
