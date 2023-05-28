@@ -176,7 +176,7 @@ class GameLevel_01 extends engine.Scene {
         // parsing of actors can only begin after background has been parsed
         // to ensure proper support shadow
         // for now here is the hero
-        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth);
+        this.mIllumHero = new Hero(this.kHeroSprite, null, 2, 6, this.mGlobalLightSet, this.kHealth, this.kHeroBulletTexture);
 
         this.mNextLevel = parser.parseNextLevel();
 
