@@ -21,9 +21,6 @@ class HeroBullet extends engine.Particle {
             this.setAcceleration(30, 0);
         }
     }
-
-
-
 } 
 
 export default HeroBullet;
